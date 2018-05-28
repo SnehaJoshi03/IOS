@@ -2,14 +2,15 @@
 //  ViewController.swift
 //  HW3
 //
-//  Created by Sneha Joshi and Akshay Khandgonda on 5/17/18.
+//  Created by Sneha Joshi on 5/17/18.
 //  Copyright © 2018 Sneha Joshi. All rights reserved.
 //
+
 
 import UIKit
 import CoreLocation
 
-class ViewController: UIViewController,SettingsViewControllerDelegate{
+class ViewController: UIViewController {
     
     
     @IBOutlet weak var p1Lat: DecimalMinusTextField!
@@ -17,28 +18,20 @@ class ViewController: UIViewController,SettingsViewControllerDelegate{
     @IBOutlet weak var p2Lat: DecimalMinusTextField!
     @IBOutlet weak var p2Lng: DecimalMinusTextField!
     
-   
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var bearingLabel: UILabel!
     
-    var dunitselect : String = "Kilometers"
-    var bunitselect : String = "Degrees"
+    var distanceUnits : String = "Kilometers"
+    var bearingUnits : String = "Degrees"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from
-        self.view.backgroundColor = BACKGROUND_COLOR
+        // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    func settingsChanged(distanceUnits: String, bearingUnits: String){
-       self.dunitselect = distanceUnits
-        self.bunitselect = bearingUnits
-        self.doCalculatations()
-        self.view.endEditing(true)
     }
     
     func doCalculatations()
@@ -51,18 +44,17 @@ class ViewController: UIViewController,SettingsViewControllerDelegate{
         let distance = p1.distance(from: p2)
         let bearing = p1.bearingToPoint(point: p2)
         
-        if dunitselect == "Kilometers" {
-            self.distanceLabel.text = "Distance \((distance / 10.0).rounded() / 100.0) kilometer"
+        if distanceUnits == "Kilometers" {
+            self.distanceLabel.text = "Distance: \((distance / 10.0).rounded() / 100.0) kilometers"
         } else {
-            self.distanceLabel.text = "Distance \((distance * 0.0621371).rounded() / 100.0 ) miles "
+            self.distanceLabel.text = "Distance: \((distance * 0.0621371).rounded() / 100.0) miles"
         }
         
-        if bunitselect == "Degrees" {
-            self.bearingLabel.text = "Bearing \((bearing * 100).rounded() / 100.0) degrees"
+        if bearingUnits == "Degrees" {
+            self.bearingLabel.text = "Bearing: \((bearing * 100).rounded() / 100.0) degrees."
         } else {
-            self.bearingLabel.text = "Bearing \((bearing * 1777.7777777778).rounded() / 100.0) mils"
+            self.bearingLabel.text = "Bearing: \((bearing * 1777.7777777778).rounded() / 100.0) mils."
         }
-    
     }
     
     @IBAction func calculateButtonPressed(_ sender: UIButton) {
@@ -81,24 +73,29 @@ class ViewController: UIViewController,SettingsViewControllerDelegate{
         self.p1Lng.text = ""
         self.p2Lat.text = ""
         self.p2Lng.text = ""
-        self.distanceLabel.text = " "
-        self.bearingLabel.text = " "
-        self.view.endEditing(true)  
+        self.distanceLabel.text = "Distance: "
+        self.bearingLabel.text = "Bearing: "
+        self.view.endEditing(true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-       
-            if let dest = segue.destination.childViewControllers[0] as? SettingsViewController {
-               dest.dUnits = self.dunitselect
-                dest.bUnits = self.bunitselect
+        if segue.identifier == "settingsSegue" {
+            if let dest = segue.destination as? SettingsViewController {
+                dest.dUnits = self.distanceUnits
+                dest.bUnits = self.bearingUnits
                 dest.delegate = self
             }
         }
-    
     }
+}
 
-
-
-
-
+extension ViewController : SettingsViewControllerDelegate
+{
+    func settingsChanged(distanceUnits: String, bearingUnits: String)
+    {
+        self.distanceUnits = distanceUnits
+        self.bearingUnits = bearingUnits
+        self.doCalculatations()
+    }
+}
 
